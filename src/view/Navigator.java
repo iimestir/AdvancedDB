@@ -54,8 +54,7 @@ public class Navigator<T> {
      * @param panel panel
      */
     public void push(Panel panel) {
-        final FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/" + panel.getPath()),
-                ResourceBundle.getBundle("translation", Utils.CURRENT_LOCALE));
+        final FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/" + panel.getPath()));
 
         try {
             final Parent parent = loader.load();
