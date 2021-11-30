@@ -20,7 +20,7 @@
 <?import javafx.scene.text.Font?>
 
 
-<VBox spacing="10.0" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<VBox spacing="10.0" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.MainViewController">
    <children>
       <MenuBar>
         <menus>
@@ -51,7 +51,7 @@
       </Label>
       <HBox alignment="CENTER" spacing="10.0">
          <children>
-            <ComboBox fx:id="animalCategory" promptText="Select an animal category" />
+            <ComboBox fx:id="animalCategoryComboBox" promptText="Select an animal category" />
             <ComboBox fx:id="animalComboBox" promptText="Select a registered animal" />
          </children>
          <VBox.margin>
