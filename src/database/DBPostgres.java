@@ -1,5 +1,6 @@
 package database;
 
+import model.BenchmarkedObject;
 import model.dto.*;
 
 import java.util.List;
@@ -11,47 +12,47 @@ public class DBPostgres implements DBInterface {
     }
 
     @Override
-    public List<Animal> getAllAnimals() {
+    public List<BenchmarkedObject<List<Animal>>> getAllAnimals() {
         return null;
     }
 
     @Override
-    public List<AnimalType> getAllTypes() {
+    public List<BenchmarkedObject<List<AnimalType>>> getAllTypes() {
         return null;
     }
 
     @Override
-    public List<Animal> getAllAnimalsByType(AnimalType type) {
+    public List<BenchmarkedObject<List<Animal>>> getAllAnimalsByType(AnimalType type) {
         return null;
     }
 
     @Override
-    public List<Picture> getAnimalPicture(Animal animal) {
+    public List<BenchmarkedObject<List<Picture>>> getAnimalPicture(Animal animal) {
         return null;
     }
 
     @Override
-    public List<Video> getAnimalVideo(Animal animal) {
+    public List<BenchmarkedObject<List<Video>>> getAnimalVideo(Animal animal) {
         return null;
     }
 
     @Override
-    public List<Sound> getAnimalSound(Animal animal) {
+    public List<BenchmarkedObject<List<Sound>>> getAnimalSound(Animal animal) {
         return null;
     }
 
     @Override
-    public double insertType(String type) {
-        return 0;
+    public BenchmarkedObject insertType(String type) {
+        return null;
     }
 
     @Override
-    public double insertAnimal(String type, Animal animal) {
-        return 0;
+    public BenchmarkedObject insertAnimal(String type, Animal animal) {
+        return null;
     }
 
     @Override
-    public double insertMedia(Animal animal, Media media) {
-        return 0;
+    public BenchmarkedObject insertMedia(Animal animal, Media media) {
+        return null;
     }
 }
