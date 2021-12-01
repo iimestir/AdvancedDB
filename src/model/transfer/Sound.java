@@ -1,4 +1,4 @@
-package model.dto;
+package model.transfer;
 
 public class Sound extends Media {
     public Sound(int id, byte[] sound) {

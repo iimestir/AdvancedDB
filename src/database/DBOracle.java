@@ -1,15 +1,12 @@
 package database;
 
 import model.BenchmarkedObject;
-import model.dto.*;
-
+import model.transfer.*;
 import java.util.List;
 
-public class DBOracle implements DBInterface {
-
-    @Override
-    public void connect() {
-
+public class DBOracle extends DBInterface {
+    public DBOracle() {
+        super("orcl2", "jdbc:oracle:thin:@localhost:1521:", "SYSTEM", "1234");
     }
 
     @Override

@@ -1,14 +1,12 @@
 package database;
 
 import model.BenchmarkedObject;
-import model.dto.*;
-
+import model.transfer.*;
 import java.util.List;
 
-public class DBPostgres implements DBInterface {
-    @Override
-    public void connect() {
-
+public class DBPostgres extends DBInterface {
+    public DBPostgres() {
+        super("ADB_APPLICATION", "jdbc:postgresql://localhost/", "adb_user", "password");
     }
 
     @Override

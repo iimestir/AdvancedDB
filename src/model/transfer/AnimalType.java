@@ -1,4 +1,4 @@
-package model.dto;
+package model.transfer;
 
 public class AnimalType extends DTO<Integer> {
     private String category;

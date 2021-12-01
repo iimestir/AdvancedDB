@@ -1,4 +1,4 @@
-package model.dto;
+package model.transfer;
 
 public class Media extends DTO<Integer> {
     private final byte[] media;

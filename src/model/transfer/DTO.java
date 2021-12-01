@@ -1,4 +1,4 @@
-package model.dto;
+package model.transfer;
 
 public abstract class DTO<T> {
     protected T id;
