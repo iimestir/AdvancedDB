@@ -51,22 +51,22 @@ public abstract class DBInterface {
     }
 
     // Select - DB data retrievers
-    abstract List<BenchmarkedObject<List<Animal>>> getAllAnimals();
+    public abstract BenchmarkedObject<List<Animal>> getAllAnimals();
 
-    abstract List<BenchmarkedObject<List<AnimalType>>> getAllTypes();
+    public abstract BenchmarkedObject<List<AnimalType>> getAllTypes();
 
-    abstract List<BenchmarkedObject<List<Animal>>>  getAllAnimalsByType(AnimalType type);
+    public abstract BenchmarkedObject<List<Animal>>  getAllAnimalsByType(AnimalType type);
 
-    abstract List<BenchmarkedObject<List<Picture>>>  getAnimalPicture(Animal animal);
+    public abstract BenchmarkedObject<List<Picture>>  getAnimalPicture(Animal animal);
 
-    abstract List<BenchmarkedObject<List<Video>>>  getAnimalVideo(Animal animal);
+    public abstract BenchmarkedObject<List<Video>>  getAnimalVideo(Animal animal);
 
-    abstract List<BenchmarkedObject<List<Sound>>> getAnimalSound(Animal animal);
+    public abstract BenchmarkedObject<List<Sound>> getAnimalSound(Animal animal);
 
     // Insert - DB data inserters
-    abstract BenchmarkedObject<Void> insertType(String type);
+    public abstract BenchmarkedObject<Void> insertType(String type);
 
-    abstract BenchmarkedObject<Void> insertAnimal(String type, Animal animal);
+    public abstract BenchmarkedObject<Void> insertAnimal(String type, Animal animal);
 
-    abstract BenchmarkedObject<Void> insertMedia(Animal animal, Media media);
+    public abstract BenchmarkedObject<Void> insertMedia(Animal animal, Media media);
 }

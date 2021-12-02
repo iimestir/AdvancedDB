@@ -10,47 +10,47 @@ public class DBPostgres extends DBInterface {
     }
 
     @Override
-    public List<BenchmarkedObject<List<Animal>>> getAllAnimals() {
+    public BenchmarkedObject<List<Animal>> getAllAnimals() {
         return null;
     }
 
     @Override
-    public List<BenchmarkedObject<List<AnimalType>>> getAllTypes() {
+    public BenchmarkedObject<List<AnimalType>> getAllTypes() {
         return null;
     }
 
     @Override
-    public List<BenchmarkedObject<List<Animal>>> getAllAnimalsByType(AnimalType type) {
+    public BenchmarkedObject<List<Animal>> getAllAnimalsByType(AnimalType type) {
         return null;
     }
 
     @Override
-    public List<BenchmarkedObject<List<Picture>>> getAnimalPicture(Animal animal) {
+    public BenchmarkedObject<List<Picture>> getAnimalPicture(Animal animal) {
         return null;
     }
 
     @Override
-    public List<BenchmarkedObject<List<Video>>> getAnimalVideo(Animal animal) {
+    public BenchmarkedObject<List<Video>> getAnimalVideo(Animal animal) {
         return null;
     }
 
     @Override
-    public List<BenchmarkedObject<List<Sound>>> getAnimalSound(Animal animal) {
+    public BenchmarkedObject<List<Sound>> getAnimalSound(Animal animal) {
         return null;
     }
 
     @Override
-    public BenchmarkedObject insertType(String type) {
+    public BenchmarkedObject<Void> insertType(String type) {
         return null;
     }
 
     @Override
-    public BenchmarkedObject insertAnimal(String type, Animal animal) {
+    public BenchmarkedObject<Void> insertAnimal(String type, Animal animal) {
         return null;
     }
 
     @Override
-    public BenchmarkedObject insertMedia(Animal animal, Media media) {
+    public BenchmarkedObject<Void> insertMedia(Animal animal, Media media) {
         return null;
     }
 }

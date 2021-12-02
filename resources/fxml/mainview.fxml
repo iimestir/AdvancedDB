@@ -26,7 +26,7 @@
         <menus>
           <Menu mnemonicParsing="false" text="Database">
             <items>
-                  <RadioMenuItem fx:id="oracleMenuItem" mnemonicParsing="false" selected="true" text="Oracle">
+                  <RadioMenuItem fx:id="oracleMenuItem" mnemonicParsing="false" text="Oracle">
                      <toggleGroup>
                         <ToggleGroup fx:id="dbgroup" />
                      </toggleGroup>
@@ -90,7 +90,7 @@
                         <TextField fx:id="birthplaceField" disable="true" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                         <TextField fx:id="birthdateField" disable="true" GridPane.columnIndex="1" GridPane.rowIndex="4" />
                         <TextField fx:id="vaccinationField" disable="true" GridPane.columnIndex="1" GridPane.rowIndex="5" />
-                        <TextField fx:id="lastvisitField" disable="true" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+                        <TextField fx:id="lastVisitField" disable="true" GridPane.columnIndex="1" GridPane.rowIndex="6" />
                      </children>
                      <padding>
                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
@@ -98,17 +98,17 @@
                   </GridPane>
                </content>
             </Tab>
-          <Tab text="Pictures">
+          <Tab fx:id="picturesTab" text="Pictures">
                <content>
                   <AnchorPane fx:id="picturesPane" prefHeight="200.0" prefWidth="200.0" />
                </content>
             </Tab>
-            <Tab text="Videos">
+            <Tab fx:id="videosTab" text="Videos">
               <content>
                   <AnchorPane fx:id="videosPane" />
               </content>
             </Tab>
-            <Tab text="Sounds">
+            <Tab fx:id="soundsTab" text="Sounds">
               <content>
                 <AnchorPane fx:id="soundsPane" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
               </content>
