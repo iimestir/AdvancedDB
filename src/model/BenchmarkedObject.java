@@ -15,7 +15,7 @@ public class BenchmarkedObject<T> {
         time0 = new Date().getTime();
     }
 
-    public void stopAndSaveObject(T object) {
+    public void stopAndStoreObject(T object) {
         time1 = new Date().getTime();
         this.object = object;
     }

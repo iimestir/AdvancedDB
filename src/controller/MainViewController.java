@@ -3,20 +3,15 @@ package controller;
 import database.DBInterface;
 import database.DBOracle;
 import database.DBPostgres;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.FXCollections;
 import javafx.embed.swing.SwingFXUtils;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.media.Media;
-import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
+import javafx.util.Callback;
 import model.Database;
 import model.transfer.*;
 import utils.Utils;
@@ -24,15 +19,11 @@ import utils.Utils;
 import javax.imageio.ImageIO;
 import javax.sound.sampled.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.sql.SQLException;
-import java.util.List;
 import java.util.ResourceBundle;
-import java.util.stream.Collectors;
 
 public class MainViewController implements Initializable {
     @FXML private ToggleGroup dbgroup;
@@ -41,12 +32,11 @@ public class MainViewController implements Initializable {
     @FXML private ComboBox<AnimalType> animalCategoryComboBox;
     @FXML private ComboBox<Animal> animalComboBox;
 
+    @FXML private TabPane tabPane;
+    @FXML private Tab overviewTab;
     @FXML private Tab picturesTab;
     @FXML private Tab videosTab;
     @FXML private Tab soundsTab;
-    @FXML private AnchorPane picturesPane;
-    @FXML private AnchorPane videosPane;
-    @FXML private AnchorPane soundsPane;
     @FXML private TextField idField;
     @FXML private TextField categoryField;
     @FXML private TextField nameField;
@@ -55,64 +45,35 @@ public class MainViewController implements Initializable {
     @FXML private TextField vaccinationField;
     @FXML private TextField lastVisitField;
 
+    @FXML private ComboBox<Picture> pictureComboBox;
+    @FXML private ImageView imageView;
+    @FXML private ComboBox<Video> videoComboBox;
+    @FXML private MediaView mediaView;
+    @FXML private Button playButton;
+    @FXML private ComboBox<Sound> soundComboBox;
+
+    private SimpleObjectProperty<Animal> selectedAnimal;
+
     private DBInterface database;
 
-    private void fillAnimalTypeComboBox() {
-        animalCategoryComboBox.getItems().setAll(database.getAllTypes().getObject());
+    private void fillAnimalTypeComboBox() throws SQLException {
+        animalCategoryComboBox.setItems(FXCollections.observableArrayList(database.getAllTypes().getObject()));
     }
 
-    private void fillAnimalComboBox(AnimalType type) {
-        animalComboBox.getItems().setAll(database.getAllAnimalsByType(type).getObject());
+    private void fillAnimalComboBox(AnimalType type) throws SQLException {
+        animalComboBox.setItems(FXCollections.observableArrayList(database.getAllAnimalsByType(type).getObject()));
     }
 
-    private void fillAnimalComboBox() {
-        animalComboBox.getItems().setAll(database.getAllAnimals().getObject());
+    private void fillAnimalPicturesComboBox(Animal animal) throws SQLException {
+        pictureComboBox.setItems(FXCollections.observableArrayList(database.getAnimalPicture(animal).getObject()));
     }
 
-    private void fillAnimalPictures(Animal animal) {
-        List<Picture> pictures = database.getAnimalPicture(animal).getObject();
-
-        // TODO : Pictures controller à tester
-        picturesPane.getChildren().setAll(pictures.stream().map(e -> {
-            try {
-                InputStream is = e.getMedia().getBinaryStream();
-                BufferedImage read = ImageIO.read(is);
-                return new ImageView(SwingFXUtils.toFXImage(read, null));
-            } catch (SQLException | IOException ex) {
-                ex.printStackTrace();
-            }
-
-            return null;
-        }).collect(Collectors.toList()));
+    private void fillAnimalVideosComboBox(Animal animal) throws SQLException {
+        videoComboBox.setItems(FXCollections.observableArrayList(database.getAnimalVideo(animal).getObject()));
     }
 
-    private void fillAnimalVideos(Animal animal) {
-        // TODO : Controller video
-    }
-
-    private void fillAnimalSounds(Animal animal) {
-        List<Sound> sounds = database.getAnimalSound(animal).getObject();
-
-        // TODO : Sound controller à tester
-        soundsPane.getChildren().setAll(sounds.stream().map(e -> {
-            Button btn = new Button("Sound");
-            btn.setOnAction(event -> {
-                try {
-                    InputStream is = e.getMedia().getBinaryStream();
-                    AudioInputStream as = AudioSystem.getAudioInputStream(is);
-                    AudioFormat format = as.getFormat();
-                    DataLine.Info info = new DataLine.Info(Clip.class, format);
-
-                    Clip audioClip = (Clip) AudioSystem.getLine(info);
-                    audioClip.open(as);
-                    audioClip.start();
-                } catch (SQLException | UnsupportedAudioFileException | IOException | LineUnavailableException ex) {
-                    ex.printStackTrace();
-                }
-            });
-
-            return btn;
-        }).collect(Collectors.toList()));
+    private void fillAnimalSoundsComboBox(Animal animal) throws SQLException {
+        soundComboBox.setItems(FXCollections.observableArrayList(database.getAnimalSound(animal).getObject()));
     }
 
     private void fillAnimalTab(Animal animal) {
@@ -125,7 +86,7 @@ public class MainViewController implements Initializable {
         lastVisitField.setText(animal.getLastVisit().toString());
     }
 
-    private void connectDB(Database db) {
+    private void connectDB(Database db) throws SQLException {
         database = db == Database.ORACLE ? new DBOracle() : new DBPostgres();
 
         try {
@@ -146,30 +107,77 @@ public class MainViewController implements Initializable {
     }
 
     private void initMenuItems() {
-        oracleMenuItem.setOnAction(e -> connectDB(Database.ORACLE));
-        postgreMenuItem.setOnAction(e -> connectDB(Database.POSTGRES));
+        oracleMenuItem.setOnAction(e -> {
+            try {
+                connectDB(Database.ORACLE);
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+        });
+        postgreMenuItem.setOnAction(e -> {
+            try {
+                connectDB(Database.POSTGRES);
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+        });
     }
 
     private void initTabs() {
-        picturesTab.selectedProperty().addListener((observable, oldValue, newValue) -> {
-            Animal animal = animalComboBox.getSelectionModel().getSelectedItem();
+        picturesTab.setDisable(true);
+        videosTab.setDisable(true);
+        soundsTab.setDisable(true);
 
-            if(animal != null)
-                fillAnimalPictures(animal);
+        picturesTab.setOnSelectionChanged(e -> {
+            if(selectedAnimal.get() != null) {
+                try {
+                    fillAnimalPicturesComboBox(selectedAnimal.get());
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+            }
         });
 
-        videosTab.selectedProperty().addListener((observable, oldValue, newValue) -> {
-            Animal animal = animalComboBox.getSelectionModel().getSelectedItem();
-
-            if(animal != null)
-                fillAnimalVideos(animal);
+        videosTab.setOnSelectionChanged(e -> {
+            if(selectedAnimal.get() != null) {
+                try {
+                    fillAnimalVideosComboBox(selectedAnimal.get());
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+            }
         });
 
-        soundsTab.selectedProperty().addListener((observable, oldValue, newValue) -> {
-            Animal animal = animalComboBox.getSelectionModel().getSelectedItem();
+        soundsTab.setOnSelectionChanged(e -> {
+            if(selectedAnimal.get() != null) {
+                try {
+                    fillAnimalSoundsComboBox(selectedAnimal.get());
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
 
-            if(animal != null)
-                fillAnimalSounds(animal);
+        selectedAnimal.addListener((observable, oldValue, newValue) -> {
+            tabPane.getSelectionModel().select(overviewTab);
+
+            if(selectedAnimal.get() != null) {
+                picturesTab.setDisable(false);
+                videosTab.setDisable(false);
+                soundsTab.setDisable(false);
+            } else {
+                picturesTab.setDisable(true);
+                videosTab.setDisable(true);
+                soundsTab.setDisable(true);
+
+                pictureComboBox.getItems().clear();
+                soundComboBox.getItems().clear();
+                videoComboBox.getItems().clear();
+
+                imageView.setImage(null);
+                mediaView.setMediaPlayer(null);
+                playButton.setOnAction(e -> { });
+            }
         });
     }
 
@@ -187,17 +195,117 @@ public class MainViewController implements Initializable {
             }
         });
 
-        animalCategoryComboBox.selectionModelProperty().addListener((observable, oldValue, newValue) ->
-                fillAnimalComboBox(newValue.getSelectedItem()));
+        animalCategoryComboBox.valueProperty().addListener((observable, oldValue, newValue) ->
+        {
+            if(newValue == null)
+                return;
 
-        animalComboBox.selectionModelProperty().addListener((observable, oldValue, newValue) ->
-                fillAnimalTab(newValue.getSelectedItem()));
+            selectedAnimal.set(null);
+
+            try {
+                fillAnimalComboBox(newValue);
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+        });
+
+        animalComboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
+            if(newValue == null)
+                return;
+
+            selectedAnimal.setValue(newValue);
+
+            fillAnimalTab(newValue);
+        });
+
+        initComboBoxesCallback();
+    }
+
+    private void initComboBoxesCallback() {
+        animalCategoryComboBox.setCellFactory(new Callback<>() {
+            @Override
+            public ListCell<AnimalType> call(ListView<AnimalType> param) {
+                return new ListCell<>() {
+                    @Override
+                    protected void updateItem(AnimalType item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (item == null || empty) {
+                            setGraphic(null);
+                        } else {
+                            setText(item.getId() + "\t" + item.getCategoryName());
+                        }
+                    }
+                };
+            }
+        });
+
+        animalComboBox.setCellFactory(new Callback<>() {
+            @Override
+            public ListCell<Animal> call(ListView<Animal> param) {
+                return new ListCell<>() {
+                    @Override
+                    protected void updateItem(Animal item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (item == null || empty) {
+                            setGraphic(null);
+                        } else {
+                            setText(item.getId() + "\t" + item.getName());
+                        }
+                    }
+                };
+            }
+        });
+    }
+
+    private void initInnerComboBoxes() {
+        pictureComboBox.valueProperty().addListener((observable, oldValue, newValue) ->
+        {
+
+            if(newValue == null)
+                return;
+
+            try {
+                InputStream is = newValue.getMedia().getBinaryStream();
+
+                BufferedImage read = ImageIO.read(is);
+                imageView.setImage(SwingFXUtils.toFXImage(read, null));
+            } catch (IOException | SQLException e) {
+                e.printStackTrace();
+            }
+        });
+
+        soundComboBox.valueProperty().addListener((observable, oldValue, newValue) ->
+        {
+            if(newValue == null)
+                return;
+
+            playButton.setOnAction(e -> {
+                try {
+                    InputStream is = newValue.getMedia().getBinaryStream();
+
+                    AudioInputStream as = AudioSystem.getAudioInputStream(is);
+                    AudioFormat format = as.getFormat();
+                    DataLine.Info info = new DataLine.Info(Clip.class, format);
+
+                    Clip audioClip = (Clip) AudioSystem.getLine(info);
+                    audioClip.open(as);
+                    audioClip.start();
+                } catch (IOException | SQLException | UnsupportedAudioFileException | LineUnavailableException ex) {
+                    ex.printStackTrace();
+                }
+            });
+        });
+
+        // TODO : Videos
     }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        selectedAnimal = new SimpleObjectProperty<>();
+
         initMenuItems();
         initComboBoxes();
+        initInnerComboBoxes();
         initTabs();
     }
 }

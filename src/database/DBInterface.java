@@ -14,7 +14,7 @@ public abstract class DBInterface {
     private final String DB_USER;
     private final String DB_PWD;
 
-    private Connection connection;
+    protected Connection connection;
 
     protected DBInterface(String DB_NAME, String DB_URL, String DB_USER, String DB_PWD) {
         this.DB_NAME = DB_NAME;
@@ -51,17 +51,17 @@ public abstract class DBInterface {
     }
 
     // Select - DB data retrievers
-    public abstract BenchmarkedObject<List<Animal>> getAllAnimals();
+    public abstract BenchmarkedObject<List<Animal>> getAllAnimals() throws SQLException;
 
-    public abstract BenchmarkedObject<List<AnimalType>> getAllTypes();
+    public abstract BenchmarkedObject<List<AnimalType>> getAllTypes() throws SQLException;
 
-    public abstract BenchmarkedObject<List<Animal>>  getAllAnimalsByType(AnimalType type);
+    public abstract BenchmarkedObject<List<Animal>>  getAllAnimalsByType(AnimalType type) throws SQLException;
 
-    public abstract BenchmarkedObject<List<Picture>>  getAnimalPicture(Animal animal);
+    public abstract BenchmarkedObject<List<Picture>>  getAnimalPicture(Animal animal) throws SQLException;
 
-    public abstract BenchmarkedObject<List<Video>>  getAnimalVideo(Animal animal);
+    public abstract BenchmarkedObject<List<Video>>  getAnimalVideo(Animal animal) throws SQLException;
 
-    public abstract BenchmarkedObject<List<Sound>> getAnimalSound(Animal animal);
+    public abstract BenchmarkedObject<List<Sound>> getAnimalSound(Animal animal) throws SQLException;
 
     // Insert - DB data inserters
     public abstract BenchmarkedObject<Void> insertType(String type);
