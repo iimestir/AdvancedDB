@@ -14,7 +14,7 @@
             <name>IMESTIR Ibrahim</name>
         </developer>
         <developer>
-            <id>??? TODO</id>
+            <id>000459836</id>
             <name>BELGADA Wassim</name>
         </developer>
     </developers>
@@ -76,8 +76,8 @@
     <dependencies>
         <dependency>
             <groupId>com.oracle.database.jdbc</groupId>
-            <artifactId>ojdbc5</artifactId>
-            <version>11.2.0.4</version>
+            <artifactId>ojdbc11</artifactId>
+            <version>21.1.0.0</version>
         </dependency>
         <dependency>
             <groupId>org.postgresql</groupId>

@@ -16,6 +16,9 @@ public class BenchmarkedObject<T> {
     }
 
     public void stopAndStoreObject(T object) {
+        if(time1 != null || this.object != null)
+            throw new IllegalStateException("Benchmark already finished");
+
         time1 = new Date().getTime();
         this.object = object;
     }

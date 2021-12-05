@@ -1,8 +1,11 @@
 package database;
 
+import javafx.util.Pair;
 import model.BenchmarkedObject;
+import model.MediaType;
 import model.transfer.*;
 
+import java.io.FileInputStream;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -54,22 +57,23 @@ public class DBOracle extends DBInterface {
         return retrieveAnimals(result, stmt);
     }
 
-    private BenchmarkedObject<List<Animal>> retrieveAnimals(BenchmarkedObject<List<Animal>> result,
-                                                            PreparedStatement stmt) throws SQLException {
-        List<Animal> selection = new ArrayList<>();
+    @Override
+    public BenchmarkedObject<List<Picture>> getAnimalPicture(Animal animal) throws SQLException {
+        BenchmarkedObject<List<Picture>> result = new BenchmarkedObject<>();
+        List<Picture> selection = new ArrayList<>();
+
+        String request = "SELECT * FROM pictures WHERE ID = ? ";
+        PreparedStatement stmt = connection.prepareStatement(request);
+        stmt.setInt(1, animal.getId());
 
         result.start();
+
         ResultSet rs = stmt.executeQuery();
         while (rs.next()) {
             int id = rs.getInt("ID");
-            int category = rs.getInt("CATEGORY");
-            String name = rs.getString("NAME");
-            Date birthDate = rs.getDate("BIRTH");
-            String birthPlace = rs.getString("BIRTH_PLACE");
-            Date vaccinationDate = rs.getDate("VACCINATION_DATE");
-            Date lastVisit = rs.getDate("LAST_VISIT");
+            Blob picture = rs.getBlob("PHOTO");
 
-            selection.add(new Animal(id, category, name, birthDate, birthPlace, vaccinationDate, lastVisit));
+            selection.add(new Picture(id, picture));
         }
 
         result.stopAndStoreObject(selection);
@@ -77,31 +81,9 @@ public class DBOracle extends DBInterface {
     }
 
     @Override
-    public BenchmarkedObject<List<Picture>> getAnimalPicture(Animal animal) throws SQLException {
-        BenchmarkedObject<List<Picture>> result = new BenchmarkedObject<>();
-        List<Picture> results = new ArrayList<>();
-
-        String request = "SELECT * FROM pictures WHERE ID = ? ";
-        PreparedStatement stmt = connection.prepareStatement(request);
-        stmt.setInt(1, animal.getId());
-
-        result.start();
-        ResultSet rs = stmt.executeQuery();
-        while (rs.next()) {
-            int id = rs.getInt("ID");
-            Blob picture = rs.getBlob("PHOTO");
-
-            results.add(new Picture(id, picture));
-        }
-
-        result.stopAndStoreObject(results);
-        return result;
-    }
-
-    @Override
     public BenchmarkedObject<List<Video>> getAnimalVideo(Animal animal) throws SQLException {
         BenchmarkedObject<List<Video>> result = new BenchmarkedObject<>();
-        List<Video> results = new ArrayList<>();
+        List<Video> selection = new ArrayList<>();
 
         String request = "SELECT * FROM videos WHERE ID = ? ";
         PreparedStatement stmt = connection.prepareStatement(request);
@@ -113,17 +95,17 @@ public class DBOracle extends DBInterface {
             int id = rs.getInt("ID");
             Blob video = rs.getBlob("VIDEO");
 
-            results.add(new Video(id, video));
+            selection.add(new Video(id, video));
         }
 
-        result.stopAndStoreObject(results);
+        result.stopAndStoreObject(selection);
         return result;
     }
 
     @Override
     public BenchmarkedObject<List<Sound>> getAnimalSound(Animal animal) throws SQLException {
         BenchmarkedObject<List<Sound>> result = new BenchmarkedObject<>();
-        List<Sound> results = new ArrayList<>();
+        List<Sound> selection = new ArrayList<>();
 
         String request = "SELECT * FROM sounds WHERE ID = ? ";
         PreparedStatement stmt = connection.prepareStatement(request);
@@ -135,25 +117,82 @@ public class DBOracle extends DBInterface {
             int id = rs.getInt("ID");
             Blob sound = rs.getBlob("SOUND");
 
-            results.add(new Sound(id, sound));
+            selection.add(new Sound(id, sound));
         }
 
-        result.stopAndStoreObject(results);
+        result.stopAndStoreObject(selection);
         return result;
     }
 
     @Override
-    public BenchmarkedObject<Void> insertType(String type) {
-        return null;
+    public BenchmarkedObject<Void> insertType(List<String> types) throws SQLException {
+        BenchmarkedObject<Void> result = new BenchmarkedObject<>();
+        String request = "INSERT INTO animal_type(NAME) VALUES(?)";
+
+        result.start();
+
+        for(String type : types) {
+            PreparedStatement stmt = connection.prepareStatement(request);
+            stmt.setString(1, type);
+
+            stmt.executeUpdate();
+        }
+
+        result.stopAndStoreObject(null);
+        return result;
     }
 
     @Override
-    public BenchmarkedObject<Void> insertAnimal(String type, Animal animal) {
-        return null;
+    public BenchmarkedObject<Void> insertAnimal(List<Animal> animals) throws SQLException {
+        BenchmarkedObject<Void> result = new BenchmarkedObject<>();
+        String request = "INSERT INTO animals(CATEGORY,NAME,BIRTH,BIRTH_PLACE,VACCINATION_DATE,LAST_VISIT) " +
+                "VALUES(?,?,?,?,?,?)";
+
+        result.start();
+
+        for(Animal animal : animals) {
+            PreparedStatement stmt = connection.prepareStatement(request);
+            stmt.setInt(1, animal.getCategory());
+            stmt.setString(2, animal.getName());
+            stmt.setDate(3, animal.getBirthDate());
+            stmt.setString(4, animal.getBirthPlace());
+            stmt.setDate(5, animal.getVaccinationDate());
+            stmt.setDate(6, animal.getLastVisit());
+
+            stmt.executeUpdate();
+        }
+
+        result.stopAndStoreObject(null);
+        return result;
     }
 
     @Override
-    public BenchmarkedObject<Void> insertMedia(Animal animal, Media media) {
-        return null;
+    public BenchmarkedObject<Void> insertMedia(MediaType mediaType, List<Pair<Animal, FileInputStream>> pairs) throws SQLException {
+        BenchmarkedObject<Void> result = new BenchmarkedObject<>();
+        result.start();
+
+        Pair<String, String> mediaDB = getMediaDBName(mediaType);
+
+        String request = "INSERT INTO " + mediaDB.getKey() + " (ID," + mediaDB.getValue() + ") " +
+                "VALUES(?,?)";
+        PreparedStatement stmt = connection.prepareStatement(request);
+
+        int i = 0;
+        for(Pair<Animal, FileInputStream> pair : pairs) {
+            stmt.setInt(1, pair.getKey().getId());
+            stmt.setBlob(2, pair.getValue());
+
+            stmt.addBatch();
+
+            if(i++%200 == 0) {
+                stmt.executeBatch();
+            }
+
+            stmt.clearParameters();
+        }
+        stmt.close();
+
+        result.stopAndStoreObject(null);
+        return result;
     }
 }

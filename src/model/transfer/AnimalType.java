@@ -11,4 +11,9 @@ public class AnimalType extends DTO<Integer> {
     public String getCategoryName() {
         return category;
     }
+
+    @Override
+    public String toString() {
+        return this.id + "\t" + this.category;
+    }
 }

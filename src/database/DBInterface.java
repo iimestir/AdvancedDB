@@ -1,11 +1,13 @@
 package database;
 
+import javafx.util.Pair;
 import model.BenchmarkedObject;
+import model.MediaType;
 import model.transfer.*;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import java.io.FileInputStream;
+import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public abstract class DBInterface {
@@ -50,6 +52,43 @@ public abstract class DBInterface {
         connect().setAutoCommit(true);
     }
 
+    protected BenchmarkedObject<List<Animal>> retrieveAnimals(BenchmarkedObject<List<Animal>> result,
+                                                            PreparedStatement stmt) throws SQLException {
+        List<Animal> selection = new ArrayList<>();
+
+        result.start();
+        ResultSet rs = stmt.executeQuery();
+        while (rs.next()) {
+            int id = rs.getInt("ID");
+            int category = rs.getInt("CATEGORY");
+            String name = rs.getString("NAME");
+            Date birthDate = rs.getDate("BIRTH");
+            String birthPlace = rs.getString("BIRTH_PLACE");
+            Date vaccinationDate = rs.getDate("VACCINATION_DATE");
+            Date lastVisit = rs.getDate("LAST_VISIT");
+
+            selection.add(new Animal(id, category, name, birthDate, birthPlace, vaccinationDate, lastVisit));
+        }
+
+        result.stopAndStoreObject(selection);
+        return result;
+    }
+
+    protected Pair<String,String> getMediaDBName(MediaType type) {
+        switch(type) {
+            case Picture -> {
+                return new Pair<>("pictures","PHOTO");
+            }
+            case Video -> {
+                return new Pair<>("videos","VIDEO");
+            }
+            case Sound -> {
+                return new Pair<>("sounds","SOUND");
+            }
+            default -> throw new IllegalStateException("Unexpected value: " + type);
+        }
+    }
+
     // Select - DB data retrievers
     public abstract BenchmarkedObject<List<Animal>> getAllAnimals() throws SQLException;
 
@@ -64,9 +103,9 @@ public abstract class DBInterface {
     public abstract BenchmarkedObject<List<Sound>> getAnimalSound(Animal animal) throws SQLException;
 
     // Insert - DB data inserters
-    public abstract BenchmarkedObject<Void> insertType(String type);
+    public abstract BenchmarkedObject<Void> insertType(List<String> types) throws SQLException;
 
-    public abstract BenchmarkedObject<Void> insertAnimal(String type, Animal animal);
+    public abstract BenchmarkedObject<Void> insertAnimal(List<Animal> animals) throws SQLException;
 
-    public abstract BenchmarkedObject<Void> insertMedia(Animal animal, Media media);
+    public abstract BenchmarkedObject<Void> insertMedia(MediaType mediaType, List<Pair<Animal, FileInputStream>> pairs) throws SQLException;
 }

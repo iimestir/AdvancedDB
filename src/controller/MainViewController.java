@@ -12,20 +12,26 @@ import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.media.MediaView;
 import javafx.util.Callback;
+import javafx.util.Pair;
+import model.BenchmarkedObject;
 import model.Database;
+import model.MediaType;
 import model.transfer.*;
 import utils.Utils;
 
 import javax.imageio.ImageIO;
 import javax.sound.sampled.*;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URL;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 
 public class MainViewController implements Initializable {
+    @FXML private MenuItem insertPicture;
+
     @FXML private ToggleGroup dbgroup;
     @FXML private RadioMenuItem oracleMenuItem;
     @FXML private RadioMenuItem postgreMenuItem;
@@ -49,8 +55,8 @@ public class MainViewController implements Initializable {
     @FXML private ImageView imageView;
     @FXML private ComboBox<Video> videoComboBox;
     @FXML private MediaView mediaView;
-    @FXML private Button playButton;
     @FXML private ComboBox<Sound> soundComboBox;
+    @FXML private Button playButton;
 
     private SimpleObjectProperty<Animal> selectedAnimal;
 
@@ -98,6 +104,7 @@ public class MainViewController implements Initializable {
             database = null;
             oracleMenuItem.setSelected(false);
             postgreMenuItem.setSelected(false);
+
             return;
         }
 
@@ -118,6 +125,21 @@ public class MainViewController implements Initializable {
             try {
                 connectDB(Database.POSTGRES);
             } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+        });
+
+
+        // BenchMarks
+        insertPicture.setOnAction(e -> {
+            try {
+                List<Pair<Animal, FileInputStream>> list = new ArrayList<>();
+                for(int i = 0; i < 1000; i++)
+                    list.add(new Pair<>(selectedAnimal.get(), new FileInputStream("C:\\Users\\Public\\purrr.wav")));
+
+                BenchmarkedObject<Void> bench = database.insertMedia(MediaType.Sound, list);
+                System.out.println(bench.getOperationDuration());
+            } catch (SQLException | IOException ex) {
                 ex.printStackTrace();
             }
         });
@@ -260,7 +282,6 @@ public class MainViewController implements Initializable {
     private void initInnerComboBoxes() {
         pictureComboBox.valueProperty().addListener((observable, oldValue, newValue) ->
         {
-
             if(newValue == null)
                 return;
 
@@ -296,7 +317,13 @@ public class MainViewController implements Initializable {
             });
         });
 
-        // TODO : Videos
+        videoComboBox.valueProperty().addListener((observable, oldValue, newValue) ->
+        {
+            if(newValue == null)
+                return;
+
+            // TODO : Videos
+        });
     }
 
     @Override

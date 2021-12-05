@@ -8,6 +8,7 @@ public class Utils {
         alert.setContentText(content);
         alert.setTitle(title);
         alert.setHeaderText(header);
+
         alert.showAndWait();
     }
 }

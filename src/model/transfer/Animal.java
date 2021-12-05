@@ -43,4 +43,9 @@ public class Animal extends DTO<Integer> {
     public Date getLastVisit() {
         return lastVisit;
     }
+
+    @Override
+    public String toString() {
+        return this.id + "\t" + this.name;
+    }
 }
