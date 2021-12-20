@@ -10,14 +10,13 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.media.MediaView;
 import javafx.util.Callback;
-import javafx.util.Pair;
-import model.BenchmarkedObject;
 import model.Database;
-import model.MediaType;
 import model.transfer.*;
 import utils.Utils;
+import view.dialog.BenchMarkDialog;
 
 import javax.imageio.ImageIO;
 import javax.sound.sampled.*;
@@ -25,13 +24,9 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.URL;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.ResourceBundle;
 
 public class MainViewController implements Initializable {
-    @FXML private MenuItem insertPicture;
-
     @FXML private ToggleGroup dbgroup;
     @FXML private RadioMenuItem oracleMenuItem;
     @FXML private RadioMenuItem postgreMenuItem;
@@ -63,23 +58,28 @@ public class MainViewController implements Initializable {
     private DBInterface database;
 
     private void fillAnimalTypeComboBox() throws SQLException {
-        animalCategoryComboBox.setItems(FXCollections.observableArrayList(database.getAllTypes().getObject()));
+        var ee = database.getAllTypes();
+        animalCategoryComboBox.setItems(FXCollections.observableArrayList(ee.getObject()));
     }
 
     private void fillAnimalComboBox(AnimalType type) throws SQLException {
-        animalComboBox.setItems(FXCollections.observableArrayList(database.getAllAnimalsByType(type).getObject()));
+        var ee = database.getAllAnimalsByType(type);
+        animalComboBox.setItems(FXCollections.observableArrayList(ee.getObject()));
     }
 
     private void fillAnimalPicturesComboBox(Animal animal) throws SQLException {
-        pictureComboBox.setItems(FXCollections.observableArrayList(database.getAnimalPicture(animal).getObject()));
+        var ee = database.getAnimalPicture(animal);
+        pictureComboBox.setItems(FXCollections.observableArrayList(ee.getObject()));
     }
 
     private void fillAnimalVideosComboBox(Animal animal) throws SQLException {
-        videoComboBox.setItems(FXCollections.observableArrayList(database.getAnimalVideo(animal).getObject()));
+        var ee = database.getAnimalVideo(animal);
+        videoComboBox.setItems(FXCollections.observableArrayList(ee.getObject()));
     }
 
     private void fillAnimalSoundsComboBox(Animal animal) throws SQLException {
-        soundComboBox.setItems(FXCollections.observableArrayList(database.getAnimalSound(animal).getObject()));
+        var ee = database.getAnimalSound(animal);
+        soundComboBox.setItems(FXCollections.observableArrayList(ee.getObject()));
     }
 
     private void fillAnimalTab(Animal animal) {
@@ -113,6 +113,10 @@ public class MainViewController implements Initializable {
         fillAnimalTypeComboBox();
     }
 
+    public void callBenchMarkDialog(MouseEvent mouseEvent) throws IOException {
+        BenchMarkDialog.prompt().showAndWait();
+    }
+
     private void initMenuItems() {
         oracleMenuItem.setOnAction(e -> {
             try {
@@ -121,25 +125,11 @@ public class MainViewController implements Initializable {
                 ex.printStackTrace();
             }
         });
+
         postgreMenuItem.setOnAction(e -> {
             try {
                 connectDB(Database.POSTGRES);
             } catch (SQLException ex) {
-                ex.printStackTrace();
-            }
-        });
-
-
-        // BenchMarks
-        insertPicture.setOnAction(e -> {
-            try {
-                List<Pair<Animal, FileInputStream>> list = new ArrayList<>();
-                for(int i = 0; i < 1000; i++)
-                    list.add(new Pair<>(selectedAnimal.get(), new FileInputStream("C:\\Users\\Public\\purrr.wav")));
-
-                BenchmarkedObject<Void> bench = database.insertMedia(MediaType.Sound, list);
-                System.out.println(bench.getOperationDuration());
-            } catch (SQLException | IOException ex) {
                 ex.printStackTrace();
             }
         });
@@ -236,7 +226,6 @@ public class MainViewController implements Initializable {
                 return;
 
             selectedAnimal.setValue(newValue);
-
             fillAnimalTab(newValue);
         });
 

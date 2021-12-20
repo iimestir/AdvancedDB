@@ -16,6 +16,11 @@ public class DBOracle extends DBInterface {
     }
 
     @Override
+    public String whoAmI() {
+        return "ORACLE";
+    }
+
+    @Override
     public BenchmarkedObject<List<Animal>> getAllAnimals() throws SQLException {
         BenchmarkedObject<List<Animal>> result = new BenchmarkedObject<>();
 
@@ -62,7 +67,7 @@ public class DBOracle extends DBInterface {
         BenchmarkedObject<List<Picture>> result = new BenchmarkedObject<>();
         List<Picture> selection = new ArrayList<>();
 
-        String request = "SELECT * FROM pictures WHERE ID = ? ";
+        String request = "SELECT * FROM pictures WHERE ID = ?";
         PreparedStatement stmt = connection.prepareStatement(request);
         stmt.setInt(1, animal.getId());
 
@@ -191,6 +196,41 @@ public class DBOracle extends DBInterface {
             stmt.clearParameters();
         }
         stmt.close();
+
+        result.stopAndStoreObject(null);
+        return result;
+    }
+
+    @Override
+    public BenchmarkedObject<Void> deleteMedia(MediaType mediaType, Animal animal) throws SQLException {
+        BenchmarkedObject<Void> result = new BenchmarkedObject<>();
+        result.start();
+
+        Pair<String, String> mediaDB = getMediaDBName(mediaType);
+
+        String request = "DELETE FROM " + mediaDB.getKey() + " WHERE id = ?";
+        PreparedStatement stmt = connection.prepareStatement(request);
+        stmt.setInt(1, animal.getId());
+
+        stmt.executeUpdate();
+
+        result.stopAndStoreObject(null);
+        return result;
+    }
+
+    @Override
+    public BenchmarkedObject<Void> updateMedia(MediaType mediaType, FileInputStream media, Animal animal) throws SQLException {
+        BenchmarkedObject<Void> result = new BenchmarkedObject<>();
+        result.start();
+
+        Pair<String, String> mediaDB = getMediaDBName(mediaType);
+
+        String request = "UPDATE " + mediaDB.getKey() + " SET " + mediaDB.getValue() + " = ? WHERE id = ?";
+        PreparedStatement stmt = connection.prepareStatement(request);
+        stmt.setBlob(1, media);
+        stmt.setInt(2, animal.getId());
+
+        stmt.executeUpdate();
 
         result.stopAndStoreObject(null);
         return result;

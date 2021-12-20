@@ -36,10 +36,10 @@
                   <RadioMenuItem fx:id="postgreMenuItem" mnemonicParsing="false" text="PostgreSQL" toggleGroup="$dbgroup" />
             </items>
           </Menu>
-            <Menu mnemonicParsing="false" text="BenchMark">
-              <items>
-                <MenuItem fx:id="insertPicture" mnemonicParsing="false" text="Insert medias" />
-              </items>
+            <Menu>
+                <graphic>
+                    <Label text="BenchMark" onMouseClicked="#callBenchMarkDialog"/>
+                </graphic>
             </Menu>
         </menus>
       </MenuBar>

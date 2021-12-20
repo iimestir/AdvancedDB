@@ -41,7 +41,6 @@ public abstract class DBInterface {
             return;
 
         connect().commit();
-        connect().setAutoCommit(true);
     }
 
     public void rollback() throws SQLException {
@@ -49,7 +48,6 @@ public abstract class DBInterface {
             return;
 
         connect().rollback();
-        connect().setAutoCommit(true);
     }
 
     protected BenchmarkedObject<List<Animal>> retrieveAnimals(BenchmarkedObject<List<Animal>> result,
@@ -89,6 +87,8 @@ public abstract class DBInterface {
         }
     }
 
+    public abstract String whoAmI();
+
     // Select - DB data retrievers
     public abstract BenchmarkedObject<List<Animal>> getAllAnimals() throws SQLException;
 
@@ -108,4 +108,10 @@ public abstract class DBInterface {
     public abstract BenchmarkedObject<Void> insertAnimal(List<Animal> animals) throws SQLException;
 
     public abstract BenchmarkedObject<Void> insertMedia(MediaType mediaType, List<Pair<Animal, FileInputStream>> pairs) throws SQLException;
+
+    // Delete
+    public abstract BenchmarkedObject<Void> deleteMedia(MediaType mediaType, Animal animal) throws SQLException;
+
+    // Update
+    public abstract BenchmarkedObject<Void> updateMedia(MediaType mediaType, FileInputStream media, Animal animal) throws SQLException;
 }

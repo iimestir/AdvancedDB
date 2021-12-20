@@ -10,9 +10,4 @@ public class Video extends Media {
     public Video(Blob video) {
         super(null, video);
     }
-
-    @Override
-    public String toString() {
-        return this.id + "\tVideo";
-    }
 }

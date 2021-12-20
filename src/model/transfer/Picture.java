@@ -10,9 +10,4 @@ public class Picture extends Media {
     public Picture(Blob picture) {
         super(null, picture);
     }
-
-    @Override
-    public String toString() {
-        return this.id + "\tPicture";
-    }
 }

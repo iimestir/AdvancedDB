@@ -19,6 +19,11 @@ public class DBPostgres extends DBInterface {
     }
 
     @Override
+    public String whoAmI() {
+        return "POSTGRES";
+    }
+
+    @Override
     public BenchmarkedObject<List<Animal>> getAllAnimals() throws SQLException {
         BenchmarkedObject<List<Animal>> result = new BenchmarkedObject<>();
 
@@ -214,6 +219,41 @@ public class DBPostgres extends DBInterface {
             stmt.clearParameters();
         }
         stmt.close();
+
+        result.stopAndStoreObject(null);
+        return result;
+    }
+
+    @Override
+    public BenchmarkedObject<Void> deleteMedia(MediaType mediaType, Animal animal) throws SQLException {
+        BenchmarkedObject<Void> result = new BenchmarkedObject<>();
+        result.start();
+
+        Pair<String, String> mediaDB = getMediaDBName(mediaType);
+
+        String request = "DELETE FROM Public.\"" + mediaDB.getKey() + "\" WHERE \"ID\" = ?";
+        PreparedStatement stmt = connection.prepareStatement(request);
+        stmt.setInt(1, animal.getId());
+
+        stmt.executeUpdate();
+
+        result.stopAndStoreObject(null);
+        return result;
+    }
+
+    @Override
+    public BenchmarkedObject<Void> updateMedia(MediaType mediaType, FileInputStream media, Animal animal) throws SQLException {
+        BenchmarkedObject<Void> result = new BenchmarkedObject<>();
+        result.start();
+
+        Pair<String, String> mediaDB = getMediaDBName(mediaType);
+
+        String request = "UPDATE Public.\"" + mediaDB.getKey() + "\" SET \"" + mediaDB.getValue() + "\" = ? WHERE \"ID\" = ?";
+        PreparedStatement stmt = connection.prepareStatement(request);
+        stmt.setBinaryStream(1, media);
+        stmt.setInt(2, animal.getId());
+
+        stmt.executeUpdate();
 
         result.stopAndStoreObject(null);
         return result;
