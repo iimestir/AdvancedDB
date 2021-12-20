@@ -60,7 +60,7 @@
       <HBox spacing="10.0">
          <children>
             <ProgressBar fx:id="progressBar" maxWidth="1.7976931348623157E308" minHeight="20.0" progress="0.0" HBox.hgrow="ALWAYS" />
-            <Label fx:id="progressLabel" text="00%" />
+            <Label fx:id="progressLabel" text="00,00%" />
          </children>
       </HBox>
    </children>

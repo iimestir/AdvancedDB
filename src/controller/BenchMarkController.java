@@ -3,6 +3,7 @@ package controller;
 import database.DBInterface;
 import database.DBOracle;
 import database.DBPostgres;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -18,6 +19,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.net.URL;
 import java.sql.SQLException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -134,7 +136,7 @@ public class BenchMarkController implements Initializable {
     }
 
     private void benchMark() throws SQLException, FileNotFoundException {
-        enableProgress();
+        Platform.runLater(this::enableProgress);
 
         long median_oracle = 0;
         long median_pg = 0;
@@ -148,14 +150,22 @@ public class BenchMarkController implements Initializable {
                     median_oracle += oracle;
                     median_pg += pg;
 
-                    oracleListView.getItems().add("SELECT (n=" + i + ") = " + oracle + "ms");
-                    pglistView.getItems().add("SELECT (n=" + i + ") = " + pg + "ms");
+                    int finalI = i+1;
 
-                    setProgress(i/5.);
+                    Platform.runLater(() -> {
+                        oracleListView.getItems().add("SELECT (n=" + finalI + ") = " + oracle + "ms");
+                        pglistView.getItems().add("SELECT (n=" + finalI + ") = " + pg + "ms");
+                    });
+
+                    Platform.runLater(() -> setProgress(finalI /6.));
                 }
 
-                oracleListView.getItems().add("SELECT median = " + (median_oracle/6.) + "ms");
-                pglistView.getItems().add("SELECT median = " + (median_pg/6.) + "ms");
+                long finalMedian_oracle = median_oracle;
+                long finalMedian_pg = median_pg;
+                Platform.runLater(() -> {
+                    oracleListView.getItems().add("SELECT median = " + (new DecimalFormat("##.##").format(finalMedian_oracle /6.)) + "ms");
+                    pglistView.getItems().add("SELECT median = " + (new DecimalFormat("##.##").format(finalMedian_pg /6.)) + "ms");
+                });
             }
             case "INSERT" -> {
                 for(int i = 0; i < 6; i++) {
@@ -165,14 +175,22 @@ public class BenchMarkController implements Initializable {
                     median_oracle += oracle;
                     median_pg += pg;
 
-                    oracleListView.getItems().add("INSERT (n=" + i + ") = " + oracle + "ms");
-                    pglistView.getItems().add("INSERT (n=" + i + ") = " + pg + "ms");
+                    int finalI = i+1;
 
-                    setProgress(i/5.);
+                    Platform.runLater(() -> {
+                        oracleListView.getItems().add("INSERT (n=" + finalI + ") = " + oracle + "ms");
+                        pglistView.getItems().add("INSERT (n=" + finalI + ") = " + pg + "ms");
+                    });
+
+                    Platform.runLater(() -> setProgress(finalI /6.));
                 }
 
-                oracleListView.getItems().add("INSERT median = " + (median_oracle/6.) + "ms");
-                pglistView.getItems().add("INSERT median = " + (median_pg/6.) + "ms");
+                long finalMedian_oracle = median_oracle;
+                long finalMedian_pg = median_pg;
+                Platform.runLater(() -> {
+                    oracleListView.getItems().add("SELECT median = " + (new DecimalFormat("##.##").format(finalMedian_oracle /6.)) + "ms");
+                    pglistView.getItems().add("SELECT median = " + (new DecimalFormat("##.##").format(finalMedian_pg /6.)) + "ms");
+                });
             }
             case "DELETE" -> {
                 for(int i = 0; i < 6; i++) {
@@ -182,14 +200,22 @@ public class BenchMarkController implements Initializable {
                     median_oracle += oracle;
                     median_pg += pg;
 
-                    oracleListView.getItems().add("DELETE (n=" + i + ") = " + oracle + "ms");
-                    pglistView.getItems().add("DELETE (n=" + i + ") = " + pg + "ms");
+                    int finalI = i+1;
 
-                    setProgress(i/5.);
+                    Platform.runLater(() -> {
+                        oracleListView.getItems().add("DELETE (n=" + finalI + ") = " + oracle + "ms");
+                        pglistView.getItems().add("DELETE (n=" + finalI + ") = " + pg + "ms");
+                    });
+
+                    Platform.runLater(() -> setProgress(finalI /6.));
                 }
 
-                oracleListView.getItems().add("DELETE median = " + (median_oracle/6.) + "ms");
-                pglistView.getItems().add("DELETE median = " + (median_pg/6.) + "ms");
+                long finalMedian_oracle = median_oracle;
+                long finalMedian_pg = median_pg;
+                Platform.runLater(() -> {
+                    oracleListView.getItems().add("SELECT median = " + (new DecimalFormat("##.##").format(finalMedian_oracle /6.)) + "ms");
+                    pglistView.getItems().add("SELECT median = " + (new DecimalFormat("##.##").format(finalMedian_pg /6.)) + "ms");
+                });
             }
             case "UPDATE" -> {
                 for(int i = 0; i < 6; i++) {
@@ -199,20 +225,28 @@ public class BenchMarkController implements Initializable {
                     median_oracle += oracle;
                     median_pg += pg;
 
-                    oracleListView.getItems().add("UPDATE (n=" + i + ") = " + oracle + "ms");
-                    pglistView.getItems().add("UPDATE (n=" + i + ") = " + pg + "ms");
+                    int finalI = i+1;
 
-                    setProgress(i/5.);
+                    Platform.runLater(() -> {
+                        oracleListView.getItems().add("UPDATE (n=" + finalI + ") = " + oracle + "ms");
+                        pglistView.getItems().add("UPDATE (n=" + finalI + ") = " + pg + "ms");
+                    });
+
+                    Platform.runLater(() -> setProgress(finalI /6.));
                 }
 
-                oracleListView.getItems().add("UPDATE median = " + (median_oracle/6.) + "ms");
-                pglistView.getItems().add("UPDATE median = " + (median_pg/6.) + "ms");
+                long finalMedian_oracle = median_oracle;
+                long finalMedian_pg = median_pg;
+                Platform.runLater(() -> {
+                    oracleListView.getItems().add("SELECT median = " + (new DecimalFormat("##.##").format(finalMedian_oracle /6.)) + "ms");
+                    pglistView.getItems().add("SELECT median = " + (new DecimalFormat("##.##").format(finalMedian_pg /6.)) + "ms");
+                });
             }
             default -> throw new RuntimeException("Unexpected value");
         }
 
-        setProgress(0.);
-        disableProgress();
+        Platform.runLater(() -> setProgress(0.));
+        Platform.runLater(this::disableProgress);
 
         database.rollback();
     }
@@ -229,7 +263,7 @@ public class BenchMarkController implements Initializable {
 
     private void setProgress(double progress) {
         progressBar.setProgress(progress);
-        progressLabel.setText((progress*100) + "%");
+        progressLabel.setText(new DecimalFormat("##.##").format(progress*100) + "%");
     }
 
     private void initTextFields() {
@@ -243,16 +277,38 @@ public class BenchMarkController implements Initializable {
     private void initButtons() {
         pathButton.setOnAction(e -> pathTextField.setText(Utils.promptPathDialog()));
         benchButton.setOnAction(e -> {
-            try {
-                benchMark();
-            } catch (SQLException | FileNotFoundException ex) {
-                ex.printStackTrace();
-            }
+            new Thread(() -> {
+                try {
+                    Platform.runLater(this::disableControls);
+                    benchMark();
+                    Platform.runLater(this::enableControls);
+                } catch (SQLException | FileNotFoundException ex) {
+                    ex.printStackTrace();
+                }
+            }).start();
         });
         clearButton.setOnAction(e -> {
             oracleListView.getItems().clear();
             pglistView.getItems().clear();
         });
+    }
+
+    private void enableControls() {
+        mediaComboBox.setDisable(false);
+        operationComboBox.setDisable(false);
+        benchButton.setDisable(false);
+        pathButton.setDisable(false);
+        amountTextField.setDisable(false);
+        clearButton.setDisable(false);
+    }
+
+    private void disableControls() {
+        mediaComboBox.setDisable(true);
+        operationComboBox.setDisable(true);
+        benchButton.setDisable(true);
+        pathButton.setDisable(true);
+        amountTextField.setDisable(true);
+        clearButton.setDisable(true);
     }
 
     private void initComboBox() {
